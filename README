@@ -1,0 +1,85 @@
+ ===
+ hdlatency - Measure HD latency (extended)
+ Copyright (C) 2009-2011 by Arjen G. Lentz (arjen@openquery.com)
+ Open Query (http://openquery.com), Brisbane QLD, Australia
+ Licensed under Version 3 of the GNU General Public License
+
+
+ ===
+ Usage: progname [--quick] <testlabel> <filename> <MBfilesize> <seconds>
+ Example: ./hdlatency FOO-SSD1 /mnt/ssd1 1024 60 >>outfile.csv
+ Feature: output in CSV for easy graphing
+
+
+ ===
+ ChangeLog:
+ - 2009-04-25 arjen - sequential write test
+ - 2009-04-26 arjen - full spread, csv, license, docs, launchpad
+ - 2011-06-16 arjen - added --quick option, 4 char tabs (sorry, nasty diff)
+
+
+ ===
+ Background annex Documentation
+
+ Objective of this exercise...
+ - Figure out optimal I/O methods on particular devices
+ - Figure out optimal block size for particular I/O methods on these devices
+ - What are individual devices good at, and where do they suck?
+ - Is direct I/O effective or not on a particular device?
+
+ We want to approximate the kind of separate I/O operations MySQL might do:
+ - logfiles are sequential
+ - InnoDB logfile (and optionally MySQL binlog) are fsynced
+ - InnoDB datafiles can be opened with O_DIRECT
+
+ Test all of the above in all (sensible) combinations:
+ - Sequential access: reads, writes
+ - Random access: reads, writes, alternate read/write
+ - Different block sizes
+ - Direct I/O and fsync()
+ (some combinations are tested that wouldn't currently occur live)
+ - with --quick option, only 16KB block size is tested which is the InnoDB page size
+   admittedly this is not directly relevant for sequential, but in that case it'd
+   basically be like a big transaction getting committed. It's not invalid.
+
+ The following will occur in the wild now:
+ - Commit: InnoDB logfiles sequential write, fsync
+ - Recovery/poolflush: InnoDB logfiles sequential read
+ - Commit: binlog sequential write, optionally with fsync
+ - Replication: binlog sequential read
+ - InnoDB tablespace if mostly write bound: random write, optionally direct I/O
+ - InnoDB tablespace if mostly read bound: random read
+ - InnoDB tablespace, if r/w mixed: random r/w, optionally direct I/O
+   (this pattern would also occur for mixing logfiles with tablespace on same HD)
+ * Note that compiled-in InnoDB page size (tablespace) is 16384 bytes (16KB)
+
+ If you have a battery-backed RAID controller...
+ - Then your tests will significantly reflect the controller's behaviour/performance
+ - Measure underlying HD on plain controller to establish baseline
+ - your test file size should ideally be larger than the on-board cache
+
+
+ ===
+ TODO
+
+ - Currently only tested on 64-bit Linux (Ubuntu and RHEL5)
+ - Correct possible logic errors (theory and math) - see below
+ - Bugfixes as they are found/reported
+ - Code cleanup and fixup of possible missing safety logic
+
+
+ ===
+ Feedback & Contributions
+
+ This tool serves a fairly specific purpose, as described above.
+ It does not intend to test everything, so that is not a deficiency!
+
+ However, if you do have feedback within the scope of the tool,
+ please don't hesitate to contact me!
+
+ To make a contribution, simply branch at Launchpad!
+
+	Enjoy! Cheers, Arjen.
+	(arjen@openquery.com)
+
+ === end of file ===
