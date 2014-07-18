@@ -347,6 +347,11 @@ int main (int argc, char *argv[])
     max_filesize    = atol(argv[i++]) * (1024*1024);  // convert to MBs
     max_seconds     = atoi(argv[i++]);
 
+    if (max_filesize < MAX_BUFSIZE*4) {
+        fprintf(stderr, "Filesize should be at least %.0f MB (or patch hdlatency.c and decrease MAX_BUFSIZE)", (float) MAX_BUFSIZE*4/1024/1024);
+        exit(1);
+    }
+
 
     // File header
     printf("; %s %s by %s, operating on file '%s'\n",argv[0],VERSIONDATE,AUTHOR,fname);
