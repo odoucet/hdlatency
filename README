@@ -3,7 +3,7 @@
  Copyright (C) 2009-2011 by Arjen G. Lentz (arjen@openquery.com)
  Open Query (http://openquery.com), Brisbane QLD, Australia
  Licensed under Version 3 of the GNU General Public License
-
+ (Forked by Olivier Doucet)
 
  ===
  Usage: progname [--quick] <testlabel> <filename> <MBfilesize> <seconds>
