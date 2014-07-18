@@ -39,7 +39,7 @@
 #define VERSIONDATE         "2011-06-16"
 #define AUTHOR              "arjen@openquery.com"
 
-#define MAX_BUFSIZE         (256*1024)
+#define MAX_BUFSIZE         (8*1024*1024)
 #define LATENCYTEST_SECS    5
 #define LATENCYTEST_MUL     100000
 
@@ -372,7 +372,11 @@ int main (int argc, char *argv[])
         (opt_quick && alignment > INNODB_PAGESIZE) ||
         (buf = alloc_buf(MAX_BUFSIZE,alignment)) == NULL
         )
-        fprintf(stderr,"init fail\n");
+        fprintf(
+            stderr,
+            "DIRECT I/O init fail (fd=%d alignment=%d opt_quick=%d alignment>INNODB_PAGE_SIZE=%d buf_is_null=%d)\n", 
+            fd, alignment, opt_quick, (alignment > INNODB_PAGESIZE), (buf == NULL)
+        );
     else
         if (
             (opt_quick &&
@@ -412,7 +416,11 @@ int main (int argc, char *argv[])
         (opt_quick && alignment > INNODB_PAGESIZE) ||
         (buf = alloc_buf(MAX_BUFSIZE,alignment)) == NULL
         )
-        fprintf(stderr,"init fail\n");
+        fprintf(
+            stderr,
+            "NON DIRECT I/O init fail (fd=%d alignment=%d opt_quick=%d alignment>INNODB_PAGE_SIZE=%d buf_is_null=%d)\n", 
+            fd, alignment, opt_quick, (alignment > INNODB_PAGESIZE), (buf == NULL)
+        );
     else   
         if (
             // for non-direct I/O...
