@@ -191,7 +191,7 @@ int run_sequential_one (char *label, int writeops, int fd, long fsize, char *buf
 /*
     run sequential read (writeops=0) or write (writeops=1) tests for different block sizes
     run each test for at most max_seconds, or end of file (whichever comes first)
-    for direct I/O, start block size at alignment, otherwise start at 1
+    for direct I/O, start block size at alignment
 */
 int run_sequential_all (char *label, int writeops, int fd, long fsize, char *buf,
                         long msize, int alignment, int direct, int max_seconds, int timeofday_latency)
@@ -201,7 +201,7 @@ int run_sequential_all (char *label, int writeops, int fd, long fsize, char *buf
     fprintf(stderr,"= %s SEQ %-6s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
         label, writeops ? "WRONLY" : "RDONLY",fsize,msize,alignment,direct,max_seconds);
 
-    for (iosize = direct ? alignment : 1; iosize <= msize; iosize <<= 1) {
+    for (iosize = alignment; iosize <= msize; iosize <<= 1) {
         if (!run_sequential_one(label,writeops,fd,fsize,buf,
                                 msize,alignment,direct,max_seconds,timeofday_latency,
                                 iosize))
@@ -286,7 +286,7 @@ int run_random_one (char *label, int writeops, int fd, long fsize, char *buf,
 /*
     run random read (writeops=0), write (writeops=1), read/write alternately (writeops=2) tests for different block sizes
     run each test for max_seconds
-    for direct I/O, start block size at alignment, otherwise start at 1
+    for direct I/O, start block size at alignment
 */
 int run_random_all (char *label, int writeops, int fd, long fsize, char *buf,
                     long msize, int alignment, int direct, int max_seconds, int timeofday_latency)
@@ -296,7 +296,7 @@ int run_random_all (char *label, int writeops, int fd, long fsize, char *buf,
     fprintf(stderr,"= %s RND %-6s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
         label, writeops ? (writeops==2 ? "RDWR" : "WRONLY") : "RDONLY",fsize,msize,alignment,direct,max_seconds);
 
-    for (iosize = direct ? alignment : 1; iosize <= msize; iosize <<= 1) {
+    for (iosize = alignment; iosize <= msize; iosize <<= 1) {
         if (!run_random_one(label,writeops,fd,fsize,buf,
                             msize,alignment,direct,max_seconds,timeofday_latency,
                             iosize))
