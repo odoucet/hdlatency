@@ -198,7 +198,7 @@ int run_sequential_all (char *label, int writeops, int fd, long fsize, char *buf
 {
     long iosize;
 
-    fprintf(stderr,"= %s SEQ %s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
+    fprintf(stderr,"= %s SEQ %-6s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
         label, writeops ? "WRONLY" : "RDONLY",fsize,msize,alignment,direct,max_seconds);
 
     for (iosize = direct ? alignment : 1; iosize <= msize; iosize <<= 1) {
@@ -293,7 +293,7 @@ int run_random_all (char *label, int writeops, int fd, long fsize, char *buf,
 {
     long iosize;
 
-    fprintf(stderr,"= %s RND %s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
+    fprintf(stderr,"= %s RND %-6s (fsize=%ld,msize=%ld,alignment=%d,direct=%d,max_seconds=%d)\n",
         label, writeops ? (writeops==2 ? "RDWR" : "WRONLY") : "RDONLY",fsize,msize,alignment,direct,max_seconds);
 
     for (iosize = direct ? alignment : 1; iosize <= msize; iosize <<= 1) {
@@ -348,7 +348,7 @@ int main (int argc, char *argv[])
     max_seconds     = atoi(argv[i++]);
 
     if (max_filesize < MAX_BUFSIZE*4) {
-        fprintf(stderr, "Filesize should be at least %.0f MB (or patch hdlatency.c and decrease MAX_BUFSIZE)", (float) MAX_BUFSIZE*4/1024/1024);
+        fprintf(stderr, "Filesize should be at least %.0f MB (or patch hdlatency.c and decrease MAX_BUFSIZE)\n", (float) MAX_BUFSIZE*4/1024.0/1024.0);
         exit(1);
     }
 
@@ -458,6 +458,7 @@ int main (int argc, char *argv[])
     if (buf != NULL)
         free(buf);
 
+    fprintf(stderr, "Benchmark finished.\n");
 
     exit (0);
 }/*main()*/
