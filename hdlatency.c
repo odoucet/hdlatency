@@ -36,8 +36,8 @@
 #include <sys/time.h>
 
 
-#define VERSIONDATE         "2011-06-16"
-#define AUTHOR              "arjen@openquery.com"
+#define VERSIONDATE         "2014-07-18"
+#define AUTHOR              "arjen@openquery.com and O. Doucet (github: odoucet)"
 
 #define MAX_BUFSIZE         (8*1024*1024)
 #define LATENCYTEST_SECS    5
@@ -88,20 +88,25 @@ int get_alignment (char *fname)
 
 /*
     allocate buffer of specified size, aligned (in case we want to to direct I/O)
-    fill buffer with 0xaa (fairly arbitrary, not just 0s or 1s)
+    fill buffer with /dev/urandom (and not a fairly arbitrary, 0s or 1s)
+    because compressed FS will drastically change results.
     return ptr to newly allocated buffer or NULL
 */
 char *alloc_buf (long msize, int alignment)
 {
     int res;
     char *buf;
+    FILE *fp;
 
     if ((res = posix_memalign((void *) &buf,alignment,msize)) != 0) {
         fprintf(stderr,"cannot allocate aligned buffer of %ld bytes (err %d)\n",msize,res);
         return (NULL);
     }
 
-    memset(buf,0xaa,MAX_BUFSIZE);
+    fp = fopen("/dev/urandom", "r");
+    fread(buf, MAX_BUFSIZE, 1, fp);
+    fclose(fp);
+
     return (buf);
 }/*alloc_buf()*/
 
@@ -321,7 +326,7 @@ int main (int argc, char *argv[])
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
 
-    fprintf(stderr,"%s %s by arjen@openquery.com\n\n",argv[0],VERSIONDATE);
+    fprintf(stderr,"%s %s by arjen@openquery.com, modified by O. Doucet (github: odoucet)\n\n",argv[0],VERSIONDATE);
 
     if (argc < 5 || argc > 6) {
         fprintf(stderr,"Usage: %s [--quick] <testlabel> <filename> <MBfilesize> <seconds>\n",argv[0]);
